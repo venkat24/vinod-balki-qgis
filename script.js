@@ -54,35 +54,37 @@ let initCanvas = (canvasId) => {
     return ctx;
 }
 
-
 let imageLoader = (imagePath) => {
-    let img = new Image();
-    img.src = imagePath;
-
-    return img;
+    return new Promise((resolve, reject) => {
+        try {
+            let img = new Image();
+            img.src = imagePath;
+            img.onload = () => {
+                resolve(img);
+            };
+        } catch (e) {
+            reject(e);
+        }
+    })
 }
 
-$(document).ready(() => {
+$(document).ready(async () => {
 
-    let animate = (() => {
+    let animate = await (async() => {
         // Load canvas, set BG image
         let ctx = initCanvas("main-canvas");
 
         // Load assets
-        let bgImage = imageLoader('images/bg.jpg');
-        bgImage.onload = () => {
-            ctx.drawImage(bgImage, 0, 0, 800, 600);
-        };
+        let bgImage = await imageLoader('images/bg.jpg');
+        ctx.drawImage(bgImage, 0, 0, 800, 600);
 
-        let houseSprite = imageLoader("sprites/houseSprite.png");
-        houseSprite.onload = () => {
-            ctx.drawImage(
-                houseSprite,
-                constants.houseSpriteLocation.x,
-                constants.houseSpriteLocation.y
-            );
-        };
-        let redRidingHoodSprite = imageLoader("sprites/redRidingHoodSprite.png");
+        let houseSprite = await imageLoader("sprites/houseSprite.png");
+        ctx.drawImage(
+            houseSprite,
+            constants.houseSpriteLocation.x,
+            constants.houseSpriteLocation.y
+        );
+        let redRidingHoodSprite = await imageLoader("sprites/redRidingHoodSprite.png");
 
         let redRidingHood = new RedRidingHood(
             constants.redRidingHoodStartLocation.x,
@@ -138,5 +140,4 @@ $(document).ready(() => {
     })();
 
     animate();
-
 });
