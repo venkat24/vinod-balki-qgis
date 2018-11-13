@@ -1,19 +1,13 @@
-// let moveDownAnimation = 0;
-// let moveLeftAnimation = 48;
-// let moveRightAnimation = 96;
-// let moveUpAnimation = 144;
-
-let animationStep = 0;
-
 const constants = {
     houseSpriteLocation: {
         x: 20,
         y: 30
     },
     redRidingHoodStartLocation: {
-        x: 0,
-        y: 0
-    }
+        x: 130,
+        y: 100
+    },
+    redRidingHoodSpeed: 3
 }
 
 class RedRidingHood {
@@ -30,19 +24,32 @@ class RedRidingHood {
          * Up -> 3
          */
         this.state = 0;
-        this.isMovingLeft = false;
-        this.isMovingRight = false;
+        this.movingDirection = {
+            up: false,
+            down: false,
+            left: false,
+            right: false
+        };
+        this.animationStep = 0;
     }
 
     update() {
-        if (this.isMovingRight) {
-            this.x += 5;
+        if (this.movingDirection.right) {
+            this.x += constants.redRidingHoodSpeed;
             this.state = 2;
-            animationStep = (animationStep + 1) % 4;
-        } else if (this.isMovingLeft) {
-            this.x -= 5;
+            this.animationStep = (this.animationStep + 1) % 4;
+        } else if (this.movingDirection.left) {
+            this.x -= constants.redRidingHoodSpeed;
             this.state = 1;
-            animationStep = (animationStep + 1) % 4;
+            this.animationStep = (this.animationStep + 1) % 4;
+        } else if (this.movingDirection.up) {
+            this.y -= constants.redRidingHoodSpeed;
+            this.state = 3;
+            this.animationStep = (this.animationStep + 1) % 4;
+        } else if (this.movingDirection.down) {
+            this.y += constants.redRidingHoodSpeed;
+            this.state = 0;
+            this.animationStep = (this.animationStep + 1) % 4;
         }
     }
 }
@@ -76,14 +83,7 @@ $(document).ready(async () => {
 
         // Load assets
         let bgImage = await imageLoader('images/bg.jpg');
-        ctx.drawImage(bgImage, 0, 0, 800, 600);
-
         let houseSprite = await imageLoader("sprites/houseSprite.png");
-        ctx.drawImage(
-            houseSprite,
-            constants.houseSpriteLocation.x,
-            constants.houseSpriteLocation.y
-        );
         let redRidingHoodSprite = await imageLoader("sprites/redRidingHoodSprite.png");
 
         let redRidingHood = new RedRidingHood(
@@ -94,19 +94,25 @@ $(document).ready(async () => {
 
         window.addEventListener("keydown", (e) => {
             if (e.keyCode == 37) {
-                redRidingHood.isMovingLeft = true;
-                redRidingHood.isMovingRight = false;
+                redRidingHood.movingDirection.left = true;
             } else if (e.keyCode == 39) {
-                redRidingHood.isMovingRight = true;
-                redRidingHood.isMovingLeft = false;
+                redRidingHood.movingDirection.right = true;
+            } else if (e.keyCode == 38) {
+                redRidingHood.movingDirection.up = true;
+            } else if (e.keyCode == 40) {
+                redRidingHood.movingDirection.down = true;
             }
         });
 
         window.addEventListener("keyup", (e) => {
             if (e.keyCode == 37) {
-                redRidingHood.isMovingLeft = false;
+                redRidingHood.movingDirection.left = false;
             } else if (e.keyCode == 39) {
-                redRidingHood.isMovingRight = false;
+                redRidingHood.movingDirection.right = false;
+            } else if (e.keyCode == 38) {
+                redRidingHood.movingDirection.up = false;
+            } else if (e.keyCode == 40) {
+                redRidingHood.movingDirection.down = false;
             }
         });
 
@@ -125,7 +131,7 @@ $(document).ready(async () => {
             redRidingHood.update();
 
             ctx.drawImage(redRidingHoodSprite,
-                animationStep * 32, // sprite offset
+                redRidingHood.animationStep * 32, // sprite offset
                 redRidingHood.state * 48,
                 32, // sprite width
                 48, // sprite height
