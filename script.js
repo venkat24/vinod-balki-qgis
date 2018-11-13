@@ -6,8 +6,7 @@ const constants = {
     redRidingHoodStartLocation: {
         x: 130,
         y: 100
-    },
-    redRidingHoodSpeed: 3
+    }
 }
 
 class RedRidingHood {
@@ -30,26 +29,28 @@ class RedRidingHood {
             left: false,
             right: false
         };
+        this.speed = 2.25;
         this.animationStep = 0;
+        this.animationSpeed = 0.2;
     }
 
     update() {
         if (this.movingDirection.right) {
-            this.x += constants.redRidingHoodSpeed;
+            this.x += this.speed;
             this.state = 2;
-            this.animationStep = (this.animationStep + 1) % 4;
+            this.animationStep = (this.animationStep + this.animationSpeed) % 4;
         } else if (this.movingDirection.left) {
-            this.x -= constants.redRidingHoodSpeed;
+            this.x -= this.speed;
             this.state = 1;
-            this.animationStep = (this.animationStep + 1) % 4;
+            this.animationStep = (this.animationStep + this.animationSpeed) % 4;
         } else if (this.movingDirection.up) {
-            this.y -= constants.redRidingHoodSpeed;
+            this.y -= this.speed;
             this.state = 3;
-            this.animationStep = (this.animationStep + 1) % 4;
+            this.animationStep = (this.animationStep + this.animationSpeed) % 4;
         } else if (this.movingDirection.down) {
-            this.y += constants.redRidingHoodSpeed;
+            this.y += this.speed;
             this.state = 0;
-            this.animationStep = (this.animationStep + 1) % 4;
+            this.animationStep = (this.animationStep + this.animationSpeed) % 4;
         }
     }
 }
@@ -131,7 +132,7 @@ $(document).ready(async () => {
             redRidingHood.update();
 
             ctx.drawImage(redRidingHoodSprite,
-                redRidingHood.animationStep * 32, // sprite offset
+                Math.floor(redRidingHood.animationStep) * 32, // sprite offset
                 redRidingHood.state * 48,
                 32, // sprite width
                 48, // sprite height
