@@ -8,25 +8,20 @@ let moveUpAnimation = 144;
 let redRidingHoodImage = new Image();
 redRidingHoodImage.src = "sprites/redRidingHoodSprite.png";
 
-$(document).ready(() => {
-    let canvas = document.getElementsByTagName("canvas")[0];
+let initCanvas = (canvasId) => {
+    let canvas = $("#" + canvasId).get(0);
     let ctx = canvas.getContext("2d");
-    window.addEventListener("keydown", keyDetected, false);
 
-    // Total sprite size is 128 x 192 => 32 x 48 for every individual sprite
-    redRidingHoodImage.onload = () => {
-        ctx.drawImage(redRidingHoodImage, 
-            animationStep*32, 
-            moveRightAnimation, 
-            32, 
-            48, 
-            redRidingHoodXLocation, 
-            redRidingHoodYLocation, 
-            32, 
-            48
-        );
+    return ctx;
+}
+
+let setBgImage = (ctx, bgImagePath) => {
+    let img = new Image();
+    img.src = bgImagePath;
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0, 800, 600);
     }
-});
+}
 
 function keyDetected(e) {
     let canvas = document.getElementsByTagName("canvas")[0];
@@ -58,3 +53,25 @@ function keyDetected(e) {
         48
     );
 }
+
+
+$(document).ready(() => {
+    let ctx = initCanvas("main-canvas");
+    setBgImage(ctx, 'images/bg.jpg');
+
+    window.addEventListener("keydown", keyDetected, false);
+
+    // Total sprite size is 128 x 192 => 32 x 48 for every individual sprite
+    redRidingHoodImage.onload = () => {
+        ctx.drawImage(redRidingHoodImage, 
+            animationStep*32, 
+            moveRightAnimation, 
+            32, 
+            48, 
+            redRidingHoodXLocation, 
+            redRidingHoodYLocation, 
+            32, 
+            48
+        );
+    }
+});
