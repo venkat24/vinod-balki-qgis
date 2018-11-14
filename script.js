@@ -67,6 +67,32 @@ const constants = {
         startingState: 0,
         isMoving: false
     },
+    flowerLocations: [
+        {
+            x: 180,
+            y: 335
+        },
+        {
+            x: 300,
+            y: 320
+        },
+        {
+            x: 170,
+            y: 310
+        },
+        {
+            x: 150,
+            y: 340
+        },
+        {
+            x: 310,
+            y: 340
+        },
+        {
+            x: 190,
+            y: 360
+        }
+    ],
     pathWidth: 70,
 }
 
@@ -259,6 +285,7 @@ $(document).ready(async () => {
         let forestSprite = await imageLoader("sprites/forestSprite.png");
         let wolfSprite = await imageLoader("sprites/wolfSprite.png");
         let woodcutterSprite = await imageLoader("sprites/woodcutterSprite.png");
+        let flowerSprite = await imageLoader("sprites/flower.png");
 
         let wolfCutscene = new CutScene("wolf", new PathBlock(0, 0, 0, 0), [
             "Wolf gonna rape ya mother!",
@@ -422,6 +449,10 @@ $(document).ready(async () => {
                     constants.redRidingHood.actualSize.height
                 );
             }
+
+            constants.flowerLocations.forEach(flower => {
+                ctx.drawImage(flowerSprite, flower.x, flower.y, 20, 20);
+            });
 
             if (constants.wolf.isMoving) {
                 wolf.animationStep = (wolf.animationStep + wolf.animationSpeed)%4;
