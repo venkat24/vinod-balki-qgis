@@ -1,12 +1,82 @@
 canvas {
-    margin: auto;
+    position: absolute;
     margin-top: 20px;
-    display: block;
-    border: 3px solid black
+    display: inline-block;
+    border: 3px solid black;
+    transform: translateX(-50%);
+    margin: 0 auto;
 }
 
 #theTitle {
     margin-top: 15px;
     text-align: center;
     color: rgb(235, 0, 0)
+}
+
+#main-container {
+    text-align: center;
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+}
+
+#cutscene-container {
+    transition: all 0.5s ease-in-out;
+    padding: 10px;
+    font-family: 'Satisfy', cursive;
+    font-size: 48px;
+    background-image: url('images/cutsceneBg.jpg');
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: inline-block;
+    background-color: blue;
+    margin-top: 20px;
+    width: 760px;
+    height: 550px;
+}
+
+#cutscene-content {
+    transform: translateY(200px);
+}
+
+#press-spacebar-content {
+    z-index: 400;
+    position: absolute;
+    font-size: 28px;
+    font-weight: bold;
+    font-family: "Shadows Into light", cursive;
+    color: rgb(133, 7, 7);
+    bottom: 0px;
+    right: 20px;
+}
+.pulsate {
+    -webkit-animation: pulsate 1s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    animation: pulsate 1s ease-out;
+    animation-iteration-count: infinite;
+    opacity: 0.4;
+}
+@-webkit-keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1.0;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1.0;
+    }
+    100% {
+        opacity: 0.5;
+    }
 }

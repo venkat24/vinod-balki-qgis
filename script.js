@@ -59,13 +59,13 @@ const constants = {
             height: 38
         },
         actualSize: {
-            width: 30,
-            height: 38
+            width: 44,
+            height: 58
         },
         speed: 0.5,
         animationSpeed: 0.1,
         startingState: 0,
-        isMoving: true
+        isMoving: false
     },
     pathWidth: 70,
 }
@@ -120,9 +120,26 @@ let isInsideAPath = (x, y) => {
     }
     return isInsidePath;
 }
+class CutScene {
+    constructor(name, triggerArea, scenes) {
+        this.name = name;
+        this.triggerArea = triggerArea;
+        this.scenes = scenes;
+        this.triggered = false;
+        this.triggerIndex = 0;
+    }
+
+    checkForTrigger(x, y) {
+        return this.triggerArea.checkIfInsidePathBlock(x, y);
+    }
+
+    trigger() {
+        this.triggered = true;
+    }
+}
 
 class Character {
-    constructor(x, y, image, speed, animationSpeed, state) {
+    constructor(x, y, image, speed, animationSpeed, state, cutscenes) {
         this.x = x;
         this.y = y;
         this.image = image;
@@ -144,6 +161,7 @@ class Character {
             right: false
         };
         this.animationStep = 0;
+        this.cutscenes = cutscenes;
     }
 
     update() {
@@ -180,6 +198,16 @@ class Character {
             this.state = 0;
             this.animationStep = (this.animationStep + this.animationSpeed) % 4;
         }
+
+        // Cutscene Triggers
+        this.cutscenes.forEach((cutscene, index, reference) => {
+            if (cutscene.checkForTrigger(this.x+constants.redRidingHood.actualSize.width/2, this.y+constants.redRidingHood.actualSize.height) && !cutscene.triggered) {
+                cutscene.trigger();
+                for (let direction in this.movingDirection) {
+                    this.movingDirection[direction] = false;
+                }
+            }
+        });
     }
 }
 
@@ -211,6 +239,13 @@ let drawPath = (ctx) => {
     }
 }
 
+let drawTriggers = (ctx, cutscenes) => {
+    ctx.fillStyle = "#ff0000";
+    cutscenes.forEach(cutscene => {
+        cutscene.triggerArea.draw(ctx);
+    });
+}
+
 $(document).ready(async () => {
 
     let animate = await (async() => {
@@ -225,13 +260,58 @@ $(document).ready(async () => {
         let wolfSprite = await imageLoader("sprites/wolfSprite.png");
         let woodcutterSprite = await imageLoader("sprites/woodcutterSprite.png");
 
+        let wolfCutscene = new CutScene("wolf", new PathBlock(0, 0, 0, 0), [
+            "Wolf gonna rape ya mother!",
+            "LMAO bitch"
+        ]);
+
+        let woodcutterCutscene = new CutScene("woodcutter", new PathBlock(0, 0, 0, 0), [
+            "Who's gonna save the world??",
+            "THE MOTHERFUCKING WOODCUTTER! :D"
+        ]);
+
+        let cutscenes = [
+            new CutScene(
+                "start",
+                new PathBlock(220, 120, constants.pathWidth, constants.pathWidth),
+                [
+                    "Hello",
+                    "World",
+                    "This is some more",
+                    "Sample Text",
+                ]
+            ),
+            new CutScene(
+                "forest",
+                new PathBlock(360, 375, 100, 150),
+                [
+                    "This is the second time I am saying Hello",
+                    "This is the second time I am saying World",
+                    "This is the second time I am saying This is some more",
+                    "This is the second time I am saying Sample Text",
+                ]
+            ),
+            new CutScene(
+                "reach grandma",
+                new PathBlock(530, 120, constants.pathWidth, constants.pathWidth),
+                [
+                    "I'm the wolf",
+                    "I ate your fucking mother",
+                    "Now fuck me, bitch"
+                ]
+            ),
+            wolfCutscene,
+            woodcutterCutscene
+        ];
+
         let redRidingHood = new Character(
             constants.redRidingHood.startLocation.x,
             constants.redRidingHood.startLocation.y,
             redRidingHoodSprite,
             constants.redRidingHood.speed,
             constants.redRidingHood.animationSpeed,
-            constants.redRidingHood.startingState
+            constants.redRidingHood.startingState,
+            cutscenes
         );
 
         let wolf = new Character(
@@ -251,6 +331,34 @@ $(document).ready(async () => {
             constants.woodcutter.animationSpeed,
             constants.woodcutter.startingState
         );
+        drawScene = text => {
+            $("#cutscene-content").html(text);
+            $("#cutscene-container").show();
+        }
+
+        hideScene = () => {
+            $("#cutscene-container").hide();
+        }
+
+        progressCutscene = () => {
+            redRidingHood.cutscenes.forEach((cutscene, index, reference) => {
+                if (cutscene.triggered) {
+                    cutscene.triggerIndex++;
+                    console.log(cutscene.scenes[cutscene.triggerIndex-1]);
+                    if (cutscene.triggerIndex === cutscene.scenes.length) {
+                        if (cutscene.name == "forest") {
+                            constants.wolf.isMoving = true;
+                        }
+                        if (cutscene.name == "reach grandma") {
+                            constants.woodcutter.isMoving = true;
+                        }
+                        // The cutscene is done, destroy it
+                        reference.splice(index, 1);
+                        hideScene();
+                    }
+                }
+            });
+        }
 
         window.addEventListener("keydown", (e) => {
             if (e.keyCode == 37) {
@@ -273,14 +381,19 @@ $(document).ready(async () => {
                 redRidingHood.movingDirection.up = false;
             } else if (e.keyCode == 40) {
                 redRidingHood.movingDirection.down = false;
+            } else if (e.keyCode == 32) {
+                progressCutscene();
             }
         });
+
+        hideScene();
 
         return () => {
             // Clear the canvas
             ctx.clearRect(0, 0, 800, 600);
             ctx.drawImage(bgImage, 0, 0, 800, 600);
             drawPath(ctx);
+            drawTriggers(ctx, cutscenes);
             ctx.drawImage(
                 houseSprite,
                 constants.momHouseSprite.x,
@@ -296,17 +409,19 @@ $(document).ready(async () => {
                 11*constants.grandmaHouseSprite.size
             );
 
-            redRidingHood.update();
-            ctx.drawImage(redRidingHoodSprite,
-                Math.floor(redRidingHood.animationStep) * constants.redRidingHood.spriteSize.width, // sprite offset
-                redRidingHood.state * constants.redRidingHood.spriteSize.height,
-                constants.redRidingHood.spriteSize.width,
-                constants.redRidingHood.spriteSize.height,
-                redRidingHood.x,
-                redRidingHood.y,
-                constants.redRidingHood.actualSize.width,
-                constants.redRidingHood.actualSize.height
-            );
+            if (!constants.woodcutter.isMoving) {
+                redRidingHood.update();
+                ctx.drawImage(redRidingHoodSprite,
+                    Math.floor(redRidingHood.animationStep) * constants.redRidingHood.spriteSize.width, // sprite offset
+                    redRidingHood.state * constants.redRidingHood.spriteSize.height,
+                    constants.redRidingHood.spriteSize.width,
+                    constants.redRidingHood.spriteSize.height,
+                    redRidingHood.x,
+                    redRidingHood.y,
+                    constants.redRidingHood.actualSize.width,
+                    constants.redRidingHood.actualSize.height
+                );
+            }
 
             if (constants.wolf.isMoving) {
                 wolf.animationStep = (wolf.animationStep + wolf.animationSpeed)%4;
@@ -322,7 +437,7 @@ $(document).ready(async () => {
                     constants.wolf.actualSize.height
                 );
                 if (wolf.y < 130) {
-                    alert('Cutscene now');
+                    wolfCutscene.trigger();
                     constants.wolf.isMoving = false;
                 }
             }
@@ -341,7 +456,7 @@ $(document).ready(async () => {
                     constants.woodcutter.actualSize.height
                 );
                 if (woodcutter.y < 130) {
-                    alert('Final cutscene now');
+                    woodcutterCutscene.trigger();
                     constants.woodcutter.isMoving = false;
                 }
             }
@@ -353,6 +468,12 @@ $(document).ready(async () => {
                 69*constants.forestSprite.size,
                 45*constants.forestSprite.size
             );
+
+            cutscenes.forEach(cutscene => {
+                if (cutscene.triggered) {
+                    drawScene(cutscene.scenes[cutscene.triggerIndex]);
+                }
+            });
 
             requestAnimationFrame(animate);
         }
