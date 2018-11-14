@@ -1,0 +1,12 @@
+canvas {
+    margin: auto;
+    margin-top: 20px;
+    display: block;
+    border: 3px solid black
+}
+
+#theTitle {
+    margin-top: 15px;
+    text-align: center;
+    color: rgb(235, 0, 0)
+}

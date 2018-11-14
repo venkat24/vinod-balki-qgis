@@ -26,7 +26,28 @@ const constants = {
         actualSize: {
             width: 32,
             height: 48
-        }
+        },
+        speed: 2.25,
+        animationSpeed: 0.2,
+        startingState: 0
+    },
+    wolf: {
+        startLocation: {
+            x: 520,
+            y: 330
+        },
+        spriteSize: {
+            width: 48,
+            height: 48
+        },
+        actualSize: {
+            width: 48,
+            height: 48
+        },
+        speed: 3,
+        animationSpeed: 0.1,
+        startingState: 3,
+        isMoving: true
     },
     pathWidth: 70,
 }
@@ -82,11 +103,13 @@ let isInsideAPath = (x, y) => {
     return isInsidePath;
 }
 
-class RedRidingHood {
-    constructor(x, y, image) {
+class Character {
+    constructor(x, y, image, speed, animationSpeed, state) {
         this.x = x;
         this.y = y;
         this.image = image;
+        this.speed = speed
+        this.animationSpeed = animationSpeed
 
         /**
          * State is the direction map
@@ -95,16 +118,14 @@ class RedRidingHood {
          * Right -> 2
          * Up -> 3
          */
-        this.state = 0;
+        this.state = state;
         this.movingDirection = {
             up: false,
             down: false,
             left: false,
             right: false
         };
-        this.speed = 2.25;
         this.animationStep = 0;
-        this.animationSpeed = 0.2;
     }
 
     update() {
@@ -183,11 +204,24 @@ $(document).ready(async () => {
         let houseSprite = await imageLoader("sprites/houseSprite.png");
         let redRidingHoodSprite = await imageLoader("sprites/redRidingHoodSprite.png");
         let forestSprite = await imageLoader("sprites/forestSprite.png");
+        let wolfSprite = await imageLoader("sprites/wolfSprite.png")
 
-        let redRidingHood = new RedRidingHood(
+        let redRidingHood = new Character(
             constants.redRidingHood.startLocation.x,
             constants.redRidingHood.startLocation.y,
-            redRidingHoodSprite
+            redRidingHoodSprite,
+            constants.redRidingHood.speed,
+            constants.redRidingHood.animationSpeed,
+            constants.redRidingHood.startingState
+        );
+
+        let wolf = new Character(
+            constants.wolf.startLocation.x,
+            constants.wolf.startLocation.y,
+            wolfSprite,
+            constants.wolf.speed,
+            constants.wolf.animationSpeed,
+            constants.wolf.startingState
         );
 
         window.addEventListener("keydown", (e) => {
@@ -245,6 +279,25 @@ $(document).ready(async () => {
                 constants.redRidingHood.actualSize.width,
                 constants.redRidingHood.actualSize.height
             );
+
+            if (constants.wolf.isMoving) {
+                wolf.animationStep = (wolf.animationStep + wolf.animationSpeed)%4;
+                wolf.y -= 0.7
+                ctx.drawImage(wolfSprite,
+                    Math.floor(wolf.animationStep) * constants.wolf.spriteSize.width, // sprite offset
+                    wolf.state * constants.wolf.spriteSize.height,
+                    constants.wolf.spriteSize.width,
+                    constants.wolf.spriteSize.height,
+                    wolf.x,
+                    wolf.y,
+                    constants.wolf.actualSize.width,
+                    constants.wolf.actualSize.height
+                );
+                if (wolf.y < 130) {
+                    alert('Cutscene now');
+                    constants.wolf.isMoving = false;
+                }
+            }
 
             ctx.drawImage(
                 forestSprite,
