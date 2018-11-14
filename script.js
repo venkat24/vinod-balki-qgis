@@ -3,6 +3,10 @@ const constants = {
         x: 20,
         y: 30
     },
+    forestSpriteLocation: {
+        x: 300,
+        y: 300
+    },
     redRidingHoodStartLocation: {
         x: 130,
         y: 100
@@ -85,6 +89,7 @@ $(document).ready(async () => {
         // Load assets
         let bgImage = await imageLoader('images/bg.jpg');
         let houseSprite = await imageLoader("sprites/houseSprite.png");
+        let forestSprite = await imageLoader("sprites/forestSprite.png");
         let redRidingHoodSprite = await imageLoader("sprites/redRidingHoodSprite.png");
 
         let redRidingHood = new RedRidingHood(
@@ -128,7 +133,6 @@ $(document).ready(async () => {
                 140,
                 110
             );
-
             redRidingHood.update();
 
             ctx.drawImage(redRidingHoodSprite,
@@ -140,6 +144,15 @@ $(document).ready(async () => {
                 redRidingHood.y,
                 32, // actual width
                 48 // actual height
+            );
+
+            // The forest draws on top of red riding hood
+            ctx.drawImage(
+                forestSprite,
+                constants.forestSpriteLocation.x,
+                constants.forestSpriteLocation.y,
+                230,
+                190
             );
 
             requestAnimationFrame(animate);
