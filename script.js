@@ -44,9 +44,27 @@ const constants = {
             width: 48,
             height: 48
         },
-        speed: 3,
+        speed: 0.7,
         animationSpeed: 0.1,
         startingState: 3,
+        isMoving: false
+    },
+    woodcutter: {
+        startLocation: {
+            x: 630,
+            y: 330
+        },
+        spriteSize: {
+            width: 30,
+            height: 38
+        },
+        actualSize: {
+            width: 30,
+            height: 38
+        },
+        speed: 0.5,
+        animationSpeed: 0.1,
+        startingState: 0,
         isMoving: true
     },
     pathWidth: 70,
@@ -204,7 +222,8 @@ $(document).ready(async () => {
         let houseSprite = await imageLoader("sprites/houseSprite.png");
         let redRidingHoodSprite = await imageLoader("sprites/redRidingHoodSprite.png");
         let forestSprite = await imageLoader("sprites/forestSprite.png");
-        let wolfSprite = await imageLoader("sprites/wolfSprite.png")
+        let wolfSprite = await imageLoader("sprites/wolfSprite.png");
+        let woodcutterSprite = await imageLoader("sprites/woodcutterSprite.png");
 
         let redRidingHood = new Character(
             constants.redRidingHood.startLocation.x,
@@ -222,6 +241,15 @@ $(document).ready(async () => {
             constants.wolf.speed,
             constants.wolf.animationSpeed,
             constants.wolf.startingState
+        );
+
+        let woodcutter = new Character(
+            constants.woodcutter.startLocation.x,
+            constants.woodcutter.startLocation.y,
+            woodcutterSprite,
+            constants.woodcutter.speed,
+            constants.woodcutter.animationSpeed,
+            constants.woodcutter.startingState
         );
 
         window.addEventListener("keydown", (e) => {
@@ -282,7 +310,7 @@ $(document).ready(async () => {
 
             if (constants.wolf.isMoving) {
                 wolf.animationStep = (wolf.animationStep + wolf.animationSpeed)%4;
-                wolf.y -= 0.7
+                wolf.y -= wolf.speed;
                 ctx.drawImage(wolfSprite,
                     Math.floor(wolf.animationStep) * constants.wolf.spriteSize.width, // sprite offset
                     wolf.state * constants.wolf.spriteSize.height,
@@ -296,6 +324,25 @@ $(document).ready(async () => {
                 if (wolf.y < 130) {
                     alert('Cutscene now');
                     constants.wolf.isMoving = false;
+                }
+            }
+
+            if (constants.woodcutter.isMoving) {
+                woodcutter.animationStep = (woodcutter.animationStep + woodcutter.animationSpeed)%5;
+                woodcutter.y -= woodcutter.speed;
+                ctx.drawImage(woodcutterSprite,
+                    woodcutter.state * constants.woodcutter.spriteSize.width,
+                    Math.floor(woodcutter.animationStep) * constants.woodcutter.spriteSize.height, // sprite offset
+                    constants.woodcutter.spriteSize.width,
+                    constants.woodcutter.spriteSize.height,
+                    woodcutter.x,
+                    woodcutter.y,
+                    constants.woodcutter.actualSize.width,
+                    constants.woodcutter.actualSize.height
+                );
+                if (woodcutter.y < 130) {
+                    alert('Final cutscene now');
+                    constants.woodcutter.isMoving = false;
                 }
             }
 
