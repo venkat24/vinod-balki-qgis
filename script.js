@@ -302,13 +302,17 @@ $(document).ready(async () => {
         let flowerSprite = await imageLoader("sprites/flower.png");
 
         let wolfCutscene = new CutScene("wolf", new PathBlock(0, 0, 0, 0), [
-            "Wolf gonna rape ya mother!",
-            "LMAO bitch"
+            "The wolf has arrived at the grandma's house!",
+            "<strong>Grandma : </strong>Come in dear! You're quite late, I was worried!",
+            "The wolf seized his opportunity and gobbled the poor grandmother up!",
+            "The wolf puts on the grandmother's nightgown and sleeping cap and lies in bed..."
         ]);
 
         let woodcutterCutscene = new CutScene("woodcutter", new PathBlock(0, 0, 0, 0), [
-            "Who's gonna save the world??",
-            "THE MOTHERFUCKING WOODCUTTER! :D"
+            "A woodcutter has come to Little Red Riding Hood's rescue!",
+            "<strong>Woodcutter : </strong>You bad wolf! I'm going to take you deep into the forest where you can no longer bother people!",
+            "Grandma and Little Red Riding Hood have been happily reunited!",
+            "The End"
         ]);
 
         let cutscenes = [
@@ -316,6 +320,14 @@ $(document).ready(async () => {
                 "init",
                 new PathBlock(0, 0, 800, 600),
                 [
+                    `<div style="margin-top: -125px;">
+                    Made By : 
+                    <br />Venkatraman Srikanth (106115099)
+                    <br />Gautham Kumar (106115027)
+                    <br />Sai Prashant M (112115047)
+                    <br />Akshay Ravi (106115009)
+                    <br />Anirudh Sundar (111115011)
+                    </div>`,
                     "Welcome to an interactive Red Riding Hood experience!",
                     "You control Red Riding Hood by using the arrow keys, start exploring!"
                 ]
@@ -343,27 +355,34 @@ $(document).ready(async () => {
                 [
                     "Mmmmm, what is that smell?!",
                     "Smells like fresh daisies! Boy, are they aromatic!",
-                    "This is some more",
-                    "Sample Text",
                 ]
             ),
             new CutScene(
                 "forest",
                 new PathBlock(360, 375, 100, 150),
                 [
-                    "This is the second time I am saying Hello",
-                    "This is the second time I am saying World",
-                    "This is the second time I am saying This is some more",
-                    "This is the second time I am saying Sample Text",
+                    "Look at that! It's a wolf!",
+                    "<strong>Wolf : </strong>What are you doing out here, little girl?",
+                    "<strong>Red Riding Hood : </strong>I'm on my way to see my Grandma.",
+                    "<strong>Red Riding Hood : </strong>It's actually getting late! I should be going now...",
+                    "The wolf decides to take a shortcut to the grandma's house!"
                 ]
             ),
             new CutScene(
                 "reach grandma",
                 new PathBlock(530, 120, constants.pathWidth, constants.pathWidth),
                 [
-                    "I'm the wolf",
-                    "I ate your fucking mother",
-                    "Now fuck me, bitch"
+                    "Little Red Riding Hood knocks on the door.",
+                    "<strong>Red Riding Hood : </strong>It's me, Little Red Riding Hood!",
+                    "<strong>Wolf : </strong>Come in, dear...",
+                    "<strong>Red Riding Hood : </strong>Oh grandmother! What big ears you have!",
+                    "<strong>Wolf : </strong>The better to hear you with, my dear...",
+                    "<strong>Red Riding Hood : </strong>But Grandmother! What big eyes you have!",
+                    "<strong>Wolf : </strong>The better to see you with, my dear...",
+                    "<strong>Red Riding Hood : </strong>But Grandmother!  What big teeth you have!",
+                    "<strong>Wolf : </strong>The better to eat you with, my dear!!",
+                    "The wolf begins to chase Little Red Riding Hood!",
+                    "<strong>Red Riding Hood : </strong>HELP! HELP!",
                 ]
             ),
             wolfCutscene,
@@ -436,7 +455,6 @@ $(document).ready(async () => {
             } else if (e.keyCode == 40) {
                 redRidingHood.movingDirection.down = true;
             }
-            e.preventDefault();
             return false;
         });
 
@@ -452,7 +470,6 @@ $(document).ready(async () => {
             } else if (e.keyCode == 32) {
                 progressCutscene();
             }
-            e.preventDefault();
             return false;
         });
 
