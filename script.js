@@ -73,6 +73,18 @@ const constants = {
             y: 335
         },
         {
+            x: 240,
+            y: 340
+        },
+        {
+            x: 260,
+            y: 320
+        },
+        {
+            x: 270,
+            y: 360
+        },
+        {
             x: 300,
             y: 320
         },
@@ -133,7 +145,7 @@ class PathBlock {
 
 let path = [
     new PathBlock(120,120,310,constants.pathWidth),
-    new PathBlock(220,120,constants.pathWidth, 300),
+    new PathBlock(220,120+constants.pathWidth,constants.pathWidth, 300-constants.pathWidth),
     new PathBlock(220,420,480,constants.pathWidth),
     new PathBlock(700,420+constants.pathWidth,constants.pathWidth, -300),
     new PathBlock(700+constants.pathWidth,120,-200,constants.pathWidth)
@@ -259,17 +271,19 @@ let imageLoader = (imagePath) => {
 }
 
 let drawPath = (ctx) => {
+    ctx.globalAlpha = 0.4;
     ctx.fillStyle="#afafaf";
     for (var i = 0; i < path.length; i++) {
         path[i].draw(ctx);
     }
+    ctx.globalAlpha = 1;
 }
 
 let drawTriggers = (ctx, cutscenes) => {
-    ctx.fillStyle = "#ff0000";
-    cutscenes.forEach(cutscene => {
-        cutscene.triggerArea.draw(ctx);
-    });
+    // ctx.fillStyle = "#ff0000";
+    // cutscenes.forEach(cutscene => {
+    //     cutscene.triggerArea.draw(ctx);
+    // });
 }
 
 $(document).ready(async () => {
@@ -299,11 +313,36 @@ $(document).ready(async () => {
 
         let cutscenes = [
             new CutScene(
-                "start",
-                new PathBlock(220, 120, constants.pathWidth, constants.pathWidth),
+                "init",
+                new PathBlock(0, 0, 800, 600),
                 [
-                    "Hello",
-                    "World",
+                    "Welcome to an interactive Red Riding Hood experience!",
+                    "You control Red Riding Hood by using the arrow keys, start exploring!"
+                ]
+            ),
+            new CutScene(
+                "story setup",
+                new PathBlock(200, 120, 20, constants.pathWidth),
+                [
+                    "Today is a gorgeous day!",
+                    "I should go visit grandma..."
+                ]
+            ),
+            new CutScene(
+                "pathblock",
+                new PathBlock(420, 120, 20, constants.pathWidth),
+                [
+                    "Oops! Looks like this way to Grandma's house is blocked...",
+                    "Perhaps I can go another way...",
+                    "Those daisies smell wonderful!"
+                ]
+            ),
+            new CutScene(
+                "daisies",
+                new PathBlock(220, 120 + constants.pathWidth, constants.pathWidth, constants.pathWidth),
+                [
+                    "Mmmmm, what is that smell?!",
+                    "Smells like fresh daisies! Boy, are they aromatic!",
                     "This is some more",
                     "Sample Text",
                 ]
@@ -397,6 +436,8 @@ $(document).ready(async () => {
             } else if (e.keyCode == 40) {
                 redRidingHood.movingDirection.down = true;
             }
+            e.preventDefault();
+            return false;
         });
 
         window.addEventListener("keyup", (e) => {
@@ -411,6 +452,8 @@ $(document).ready(async () => {
             } else if (e.keyCode == 32) {
                 progressCutscene();
             }
+            e.preventDefault();
+            return false;
         });
 
         hideScene();
@@ -436,6 +479,10 @@ $(document).ready(async () => {
                 11*constants.grandmaHouseSprite.size
             );
 
+            constants.flowerLocations.forEach(flower => {
+                ctx.drawImage(flowerSprite, flower.x, flower.y, 20, 20);
+            });
+
             if (!constants.woodcutter.isMoving) {
                 redRidingHood.update();
                 ctx.drawImage(redRidingHoodSprite,
@@ -449,10 +496,6 @@ $(document).ready(async () => {
                     constants.redRidingHood.actualSize.height
                 );
             }
-
-            constants.flowerLocations.forEach(flower => {
-                ctx.drawImage(flowerSprite, flower.x, flower.y, 20, 20);
-            });
 
             if (constants.wolf.isMoving) {
                 wolf.animationStep = (wolf.animationStep + wolf.animationSpeed)%4;
